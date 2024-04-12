@@ -4,7 +4,7 @@
 
   /* Make scroll more beautiful */
   &::-webkit-scrollbar {
-    width: 10px;
+    width: 4px;
   }
 
   &::-webkit-scrollbar-thumb {
