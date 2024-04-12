@@ -102,7 +102,7 @@ const Chat = () => {
           <div className="message">
             <img src="./avatar.png" alt="" />
             <div className="texts">
-              <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Minus, assumenda.</p>
+              <p>Lorem ipsum dolor.</p>
               <span>1 min ago</span>
             </div>
           </div>
