@@ -17,6 +17,35 @@ const ChatLIst = () => {
           onClick={() => setAddMode((prev) => !prev)}  // Toggle addMode between clicked display minus icon or plus icon
         />
       </div>
+
+      <div className="item">
+        <img src="./avatar.png" alt="" />
+        <div className="texts">
+          <span>Jane Doe</span>
+          <p>Hello.</p>
+        </div>
+      </div>
+      <div className="item">
+        <img src="./avatar.png" alt="" />
+        <div className="texts">
+          <span>Jane Doe</span>
+          <p>Hello.</p>
+        </div>
+      </div>
+      <div className="item">
+        <img src="./avatar.png" alt="" />
+        <div className="texts">
+          <span>Jane Doe</span>
+          <p>Hello.</p>
+        </div>
+      </div>
+      <div className="item">
+        <img src="./avatar.png" alt="" />
+        <div className="texts">
+          <span>Jane Doe</span>
+          <p>Hello.</p>
+        </div>
+      </div>
     </div>
   );
 };
