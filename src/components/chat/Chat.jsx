@@ -14,6 +14,7 @@ const Chat = () => {
 
   return (
     <div className="chat">
+      {/* ---> Top (User avatar, name & icons [call, video, info]) */}
       <div className="top">
         <div className="user">
           <img src="./avatar.png" alt="" />
@@ -30,8 +31,84 @@ const Chat = () => {
         </div>
       </div>
 
-      <div className="center"></div>
+      {/* ---> Chat */}
+      <div className="center">
+        <div className="message">
+          <img src="./avatar.png" alt="" />
+          <div className="texts">
+            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Minus, assumenda.</p>
+            <span>1 min ago</span>
+          </div>
+        </div>
+        <div className="message own">
+          <div className="texts">
+            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Minus, assumenda.</p>
+            <span>1 min ago</span>
+          </div>
+        </div>
+        <div className="message">
+          <img src="./avatar.png" alt="" />
+          <div className="texts">
+            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Minus, assumenda.</p>
+            <span>1 min ago</span>
+          </div>
+        </div>
+        <div className="message own">
+          <div className="texts">
+            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Minus, assumenda.</p>
+            <span>1 min ago</span>
+          </div>
+        </div>
+        <div className="message">
+          <img src="./avatar.png" alt="" />
+          <div className="texts">
+            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Minus, assumenda.</p>
+            <span>1 min ago</span>
+          </div>
+        </div>
+        <div className="message own">
+          <div className="texts">
+            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Minus, assumenda.</p>
+            <span>1 min ago</span>
+          </div>
+        </div>
+        <div className="message">
+          <img src="./avatar.png" alt="" />
+          <div className="texts">
+            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Minus, assumenda.</p>
+            <span>1 min ago</span>
+          </div>
+        </div>
+        <div className="message own">
+          <div className="texts">
+            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Minus, assumenda.</p>
+            <span>1 min ago</span>
+          </div>
+        </div>
+        <div className="message">
+          <img src="./avatar.png" alt="" />
+          <div className="texts">
+            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Minus, assumenda.</p>
+            <span>1 min ago</span>
+          </div>
+        </div>
+        <div className="message own">
+          <div className="texts">
+            <img src="https://images.freeimages.com/variants/k1wQB7egQotJ7Hr3ZBPP1S5c/f4a36f6589a0e50e702740b15352bc00e4bfaf6f58bd4db850e167794d05993d?fmt=webp&w=500" alt="" />
+            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Minus, assumenda.</p>
+            <span>1 min ago</span>
+          </div>
+        </div>
+          <div className="message">
+            <img src="./avatar.png" alt="" />
+            <div className="texts">
+              <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Minus, assumenda.</p>
+              <span>1 min ago</span>
+            </div>
+          </div>
+      </div>
 
+      {/* ---> Bottom (Icons [img, camera, mic], input, emoji picker & send button) */}
       <div className="bottom">
         <div className="icons">
           <img src="./img.png" alt="" />
@@ -53,7 +130,7 @@ const Chat = () => {
             onClick={() => setOpen((prev) => !prev)}
           />
           <div className="picker">
-            <EmojiPicker open={open} onEmojiClick={handleEmoji} />
+            <EmojiPicker open={open} onEmojiClick={handleEmoji} searchDisabled={true} />
           </div>
         </div>
         <button className="sendButton">Send</button>
