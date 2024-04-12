@@ -1,11 +1,24 @@
-import './chatList.css'
+import { useState } from "react";
+import "./chatList.css";
 
 const ChatLIst = () => {
+  const [addMode, setAddMode] = useState(false);
   return (
-    <div className='chatList'>
-      Welcome to chat list.
+    <div className="chatList">
+      <div className="search">
+        <div className="searchBar">
+          <img src="./search.png" alt="" />
+          <input type="text" placeholder="Search" />
+        </div>
+        <img
+          src={addMode ? "./minus.png" : "./plus.png"}
+          alt=""
+          className="add"
+          onClick={() => setAddMode((prev) => !prev)}  // Toggle addMode between clicked display minus icon or plus icon
+        />
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default ChatLIst
+export default ChatLIst;
