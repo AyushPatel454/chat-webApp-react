@@ -1,10 +1,17 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import EmojiPicker from "emoji-picker-react";
 import "./chat.css";
 
 const Chat = () => {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
+  // use useRef for scroll .chat to bottom
+  const endRef = useRef(null);
+
+  useEffect(() => {
+    // scroll chat to bottom.
+    endRef.current.scrollIntoView({ behavior: "smooth" });
+  }, [])
 
   const handleEmoji = (e) => {
     console.log(e);
@@ -99,13 +106,15 @@ const Chat = () => {
             <span>1 min ago</span>
           </div>
         </div>
-          <div className="message">
-            <img src="./avatar.png" alt="" />
-            <div className="texts">
-              <p>Lorem ipsum dolor.</p>
-              <span>1 min ago</span>
-            </div>
+        <div className="message">
+          <img src="./avatar.png" alt="" />
+          <div className="texts">
+            <p>Lorem ipsum dolor.</p>
+            <span>1 min ago</span>
           </div>
+        </div>
+
+        <div ref={endRef}></div>
       </div>
 
       {/* ---> Bottom (Icons [img, camera, mic], input, emoji picker & send button) */}
