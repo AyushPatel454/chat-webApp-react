@@ -21,6 +21,13 @@ const Login = () => {
         e.preventDefault();
     }
 
+    const handleRegister = (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+
+        const {username, email, password} = Object.fromEntries(formData);
+    }
+
   return (
     <div className='login'>
         <div className="item">
@@ -36,15 +43,15 @@ const Login = () => {
 
         <div className="item">
             <h2>Create an Account</h2>
-            <form action="">
+            <form onSubmit={handleRegister}>
                 <label htmlFor="file">
                     <img src={avatar.url || './avatar.png'} alt="" />
                     Upload an image
                 </label>
                 <input type="file" name="" id="file" style={{display: 'none'}} onChange={handleAvatar} />
+                <input type="text" placeholder='Username' name='username' />
                 <input type="text" placeholder='Email' name='email' />
                 <input type="password" placeholder='Password' name='password' />
-                <input type="password" placeholder='Confirm Password' name='confirm-password' />
                 <button>Sign Up</button>
             </form>
 
