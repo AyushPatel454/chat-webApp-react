@@ -106,7 +106,6 @@ const Chat = () => {
 
   const handleMessageChange = (e) => {
     // if user press enter key then send message
-    console.log(e.key);
     if(e.key === 'Enter') {
       handleSend();
     }
