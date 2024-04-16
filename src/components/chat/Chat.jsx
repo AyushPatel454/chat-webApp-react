@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import EmojiPicker from "emoji-picker-react";
 import "./chat.css";
-import { doc, onSnapshot } from "firebase/firestore";
+import { arrayUnion, doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { useChatStore } from "../../lib/chatStore";
+import { useUserStore } from "../../lib/userStore";
+import { set } from "firebase/database";
 
 const Chat = () => {
   const [open, setOpen] = useState(false);
@@ -12,7 +14,8 @@ const Chat = () => {
   // use useRef for scroll .chat to bottom
   const endRef = useRef(null);
 
-  const { chatId } = useChatStore();
+  const { currentUser } = useUserStore();
+  const { chatId, user } = useChatStore();
 
   useEffect(() => {
     // scroll chat to bottom.
@@ -30,23 +33,62 @@ const Chat = () => {
     };
   }, [chatId])
 
-  console.log(chat);
-
   const handleEmoji = (e) => {
     console.log(e);
     setText((prev) => prev + e.emoji);
     setOpen(false);
   };
 
+  const handleSend = async () => {
+    if(text === "") return;
+
+    // Send message to firestore.
+    try {
+      await updateDoc(doc(db, 'chats', chatId), {
+        messages: arrayUnion({
+          senderId: currentUser.id,
+          text,
+          createAt: new Date()
+        })
+      });
+
+      const userIDs = [currentUser.id, user.id];
+
+      userIDs.forEach(async (id) => {
+
+        const userChatsRef = doc(db, 'userchats', id);
+        const userChatSnapshot = await getDoc(userChatsRef);
+
+        if(userChatSnapshot.exists()) {
+          const userChatsData = userChatSnapshot.data();
+
+          const chatIndex = userChatsData.chats.findIndex((chat) => chat.chatId === chatId);
+
+          userChatsData.chats[chatIndex].lastMessage = text;
+          userChatsData.chats[chatIndex].isSeen = id === currentUser.id ? true : false;
+          userChatsData.chats[chatIndex].updateAt = Date.now();
+
+          await updateDoc(userChatsRef, {
+            chats: userChatsData.chats,
+          });
+        }
+      });
+
+      setText("");
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
     <div className="chat">
       {/* ---> Top (User avatar, name & icons [call, video, info]) */}
       <div className="top">
         <div className="user">
-          <img src="./avatar.png" alt="" />
+          <img src={user.avatar || "./avatar.png"} alt="" />
           <div className="texts">
-            <span>Jane Doe</span>
-            <p>Lorem ipsum dolor.</p>
+            <span>{user.username}</span>
+            {/* <p>Lorem ipsum dolor.</p> */}
           </div>
         </div>
 
@@ -61,7 +103,10 @@ const Chat = () => {
       <div className="center">
         {
           chat?.messages?.map((message) => (
-              <div className="message own" key={message?.createAt}>
+              <div 
+                className={`message ${message.senderId === currentUser.id ? 'own' : ''}`} 
+                key={message?.createAt}
+              >
                 <div className="texts">
                   {message.img && <img src={message.img} alt="" />}
                   <p>{message.text}</p>
@@ -75,7 +120,7 @@ const Chat = () => {
       </div>
 
       {/* ---> Bottom (Icons [img, camera, mic], input, emoji picker & send button) */}
-      <div className="bottom">
+      <div className="bottom">  
         <div className="icons">
           <img src="./img.png" alt="" />
           <img src="./camera.png" alt="" />
@@ -99,7 +144,7 @@ const Chat = () => {
             <EmojiPicker open={open} onEmojiClick={handleEmoji} searchDisabled={true} />
           </div>
         </div>
-        <button className="sendButton">Send</button>
+        <button className="sendButton" onClick={handleSend}>Send</button>
       </div>
     </div>
   );
