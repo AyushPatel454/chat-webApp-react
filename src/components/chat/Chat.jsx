@@ -22,11 +22,6 @@ const Chat = () => {
   const { chatId, user, isCurrentUserBlocked, isReceiverBlocked } = useChatStore();
 
   useEffect(() => {
-    // scroll chat to bottom.
-    // endRef.current.scrollIntoView({ behavior: "smooth" });
-  }, [])
-
-  useEffect(() => {
     // Fetching realtime data from the firestore.
     const unSub = onSnapshot(doc(db, 'chats', chatId), (res) => {
       setChat(res.data());

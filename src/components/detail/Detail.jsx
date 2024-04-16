@@ -1,13 +1,39 @@
-import { arrayRemove, arrayUnion, doc, updateDoc } from 'firebase/firestore';
+import { arrayRemove, arrayUnion, doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { useChatStore } from '../../lib/chatStore';
 import { auth, db } from '../../lib/firebase'
 import { useUserStore } from '../../lib/userStore';
 import './detail.css'
+import { useEffect, useState } from 'react';
 
 const Detail = () => {
 
+  const [sharedImage, setSharedImage] = useState([]);
   const { currentUser } = useUserStore();
   const { chatId, user, isCurrentUserBlocked, isReceiverBlocked, changeBlock } = useChatStore();
+  const [openImages, setOpenImages] = useState(true);
+
+  useEffect(() => {
+    // Fetching realtime data from the firestore.
+    const unSub = onSnapshot(doc(db, 'chats', chatId), (res) => {
+      // const { messages } = res.data();
+      // const images = messages.filter((msg) => msg.img).map((msg) => msg.img);
+      
+
+      const { messages } = res.data();
+      const images = messages.reduce((acc, msg) => {
+        if (msg.img) {
+          acc.push({url: msg.img, createAt: msg.createAt.seconds});
+        }
+        return acc;
+      }, []);
+
+      setSharedImage(images);
+    });
+
+    return () => {
+      unSub()
+    };
+  }, [chatId]);
 
   // ---> Logout
   const handleLogout = () => {
@@ -28,6 +54,32 @@ const Detail = () => {
     } catch (error) {
       console.log(error);
     }
+  }
+
+  // ---> Toggle Images
+  const toggleImages = () => {
+    setOpenImages(!openImages);
+  }
+
+  // ---> Download Image
+  const handleDownloadImage = async (img, name) => {
+    var element = document.createElement("a");
+    var file = new Blob(
+      [
+        img
+      ],
+      { type: "image/*" }
+    );
+    element.href = URL.createObjectURL(file);
+    element.download = `${name}.jpeg`;
+    element.click();
+
+    // const link = document.createElement('a');
+    // link.href = img;
+    // link.download = `${name}` + '.jpg';
+    // document.body.appendChild(link);
+    // link.click();
+    // document.body.removeChild(link);
   }
 
   return (
@@ -57,40 +109,22 @@ const Detail = () => {
         </div>
 
         <div className="option">
-          <div className="title">
+          <div className="title" onClick={toggleImages}>
             <span>Shared photos</span>
-            <img src="./arrowDown.png" alt="" />
+            <img src={openImages ? "./arrowDown.png" : "./arrowUp.png"} alt="" />
           </div>
-          <div className="photos">
-            <div className="photoItem">
-              <div className="photoDetail">
-                <img src="https://images.freeimages.com/variants/k1wQB7egQotJ7Hr3ZBPP1S5c/f4a36f6589a0e50e702740b15352bc00e4bfaf6f58bd4db850e167794d05993d?fmt=webp&w=500" alt="" />
-                <span>photo_2024_1.png</span>
-              </div>
-              <img src="./download.png" alt="" className='icon' />
+          {openImages && <div className="photos">
+            {sharedImage.map((img, index) => (
+              <div className="photoItem" key={`${chatId}_${currentUser.id}_${index}`}>
+                <div className="photoDetail">
+                  <img src={img.url} alt="" />
+                  <span>{img.createAt}.jpg</span>
+                  {/* <span>photo_{index}.png</span> */}
+                </div>
+                <img src="./download.png" alt="" className='icon' onClick={() => handleDownloadImage(img.url, img.createAt)} />
             </div>
-            <div className="photoItem">
-              <div className="photoDetail">
-                <img src="https://images.freeimages.com/variants/k1wQB7egQotJ7Hr3ZBPP1S5c/f4a36f6589a0e50e702740b15352bc00e4bfaf6f58bd4db850e167794d05993d?fmt=webp&w=500" alt="" />
-                <span>photo_2024_1.png</span>
-              </div>
-              <img src="./download.png" alt="" className='icon' />
-            </div>
-            <div className="photoItem">
-              <div className="photoDetail">
-                <img src="https://images.freeimages.com/variants/k1wQB7egQotJ7Hr3ZBPP1S5c/f4a36f6589a0e50e702740b15352bc00e4bfaf6f58bd4db850e167794d05993d?fmt=webp&w=500" alt="" />
-                <span>photo_2024_1.png</span>
-              </div>
-              <img src="./download.png" alt="" className='icon' />
-            </div>
-            <div className="photoItem">
-              <div className="photoDetail">
-                <img src="https://images.freeimages.com/variants/k1wQB7egQotJ7Hr3ZBPP1S5c/f4a36f6589a0e50e702740b15352bc00e4bfaf6f58bd4db850e167794d05993d?fmt=webp&w=500" alt="" />
-                <span>photo_2024_1.png</span>
-              </div>
-              <img src="./download.png" alt="" className='icon' />
-            </div>
-          </div>
+            )).reverse()}
+          </div>}
         </div>
 
         <div className="option">
