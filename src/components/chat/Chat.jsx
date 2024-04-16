@@ -3,6 +3,7 @@ import EmojiPicker from "emoji-picker-react";
 import "./chat.css";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../../lib/firebase";
+import { useChatStore } from "../../lib/chatStore";
 
 const Chat = () => {
   const [open, setOpen] = useState(false);
@@ -11,6 +12,8 @@ const Chat = () => {
   // use useRef for scroll .chat to bottom
   const endRef = useRef(null);
 
+  const { chatId } = useChatStore();
+
   useEffect(() => {
     // scroll chat to bottom.
     endRef.current.scrollIntoView({ behavior: "smooth" });
@@ -18,14 +21,14 @@ const Chat = () => {
 
   useEffect(() => {
     // Fetching realtime data from the firestore.
-    const unSub = onSnapshot(doc(db, 'chats', 'hfyNRKA29W4RMNcDp2Nd'), (res) => {
+    const unSub = onSnapshot(doc(db, 'chats', chatId), (res) => {
       setChat(res.data());
     });
 
     return () => {
       unSub()
     };
-  }, [])
+  }, [chatId])
 
   console.log(chat);
 
@@ -56,79 +59,17 @@ const Chat = () => {
 
       {/* ---> Chat */}
       <div className="center">
-        <div className="message">
-          <img src="./avatar.png" alt="" />
-          <div className="texts">
-            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Minus, assumenda.</p>
-            <span>1 min ago</span>
-          </div>
-        </div>
-        <div className="message own">
-          <div className="texts">
-            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Minus, assumenda.</p>
-            <span>1 min ago</span>
-          </div>
-        </div>
-        <div className="message">
-          <img src="./avatar.png" alt="" />
-          <div className="texts">
-            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Minus, assumenda.</p>
-            <span>1 min ago</span>
-          </div>
-        </div>
-        <div className="message own">
-          <div className="texts">
-            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Minus, assumenda.</p>
-            <span>1 min ago</span>
-          </div>
-        </div>
-        <div className="message">
-          <img src="./avatar.png" alt="" />
-          <div className="texts">
-            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Minus, assumenda.</p>
-            <span>1 min ago</span>
-          </div>
-        </div>
-        <div className="message own">
-          <div className="texts">
-            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Minus, assumenda.</p>
-            <span>1 min ago</span>
-          </div>
-        </div>
-        <div className="message">
-          <img src="./avatar.png" alt="" />
-          <div className="texts">
-            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Minus, assumenda.</p>
-            <span>1 min ago</span>
-          </div>
-        </div>
-        <div className="message own">
-          <div className="texts">
-            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Minus, assumenda.</p>
-            <span>1 min ago</span>
-          </div>
-        </div>
-        <div className="message">
-          <img src="./avatar.png" alt="" />
-          <div className="texts">
-            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Minus, assumenda.</p>
-            <span>1 min ago</span>
-          </div>
-        </div>
-        <div className="message own">
-          <div className="texts">
-            <img src="https://images.freeimages.com/variants/k1wQB7egQotJ7Hr3ZBPP1S5c/f4a36f6589a0e50e702740b15352bc00e4bfaf6f58bd4db850e167794d05993d?fmt=webp&w=500" alt="" />
-            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Minus, assumenda.</p>
-            <span>1 min ago</span>
-          </div>
-        </div>
-        <div className="message">
-          <img src="./avatar.png" alt="" />
-          <div className="texts">
-            <p>Lorem ipsum dolor.</p>
-            <span>1 min ago</span>
-          </div>
-        </div>
+        {
+          chat?.messages?.map((message) => (
+              <div className="message own" key={message?.createAt}>
+                <div className="texts">
+                  {message.img && <img src={message.img} alt="" />}
+                  <p>{message.text}</p>
+                  {/* <span>1 min ago</span> */}
+                </div>
+              </div>
+          ))
+        }
 
         <div ref={endRef}></div>
       </div>
