@@ -104,6 +104,15 @@ const Chat = () => {
     // endRef.current.scrollIntoView({ behavior: "smooth" });
   }
 
+  const handleMessageChange = (e) => {
+    // if user press enter key then send message
+    console.log(e.key);
+    if(e.key === 'Enter') {
+      handleSend();
+    }
+    setText(e.target.value)
+  }
+
   return (
     <div className="chat">
       {/* ---> Top (User avatar, name & icons [call, video, info]) */}
@@ -167,12 +176,13 @@ const Chat = () => {
         <input
           type="text"
           value={text}
+          onKeyDown={(e) => handleMessageChange(e)}
           placeholder={
             (isCurrentUserBlocked || isReceiverBlocked) 
               ? "You can't send a message." 
               : "Type a message..."
           }
-          onChange={(e) => setText(e.target.value)}
+          onChange={(e) => handleMessageChange(e)}
           disabled={isCurrentUserBlocked || isReceiverBlocked}
         />
 
