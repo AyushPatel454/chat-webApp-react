@@ -19,11 +19,11 @@ const Chat = () => {
   const endRef = useRef(null);
 
   const { currentUser } = useUserStore();
-  const { chatId, user } = useChatStore();
+  const { chatId, user, isCurrentUserBlocked, isReceiverBlocked } = useChatStore();
 
   useEffect(() => {
     // scroll chat to bottom.
-    endRef.current.scrollIntoView({ behavior: "smooth" });
+    // endRef.current.scrollIntoView({ behavior: "smooth" });
   }, [])
 
   useEffect(() => {
@@ -35,7 +35,7 @@ const Chat = () => {
     return () => {
       unSub()
     };
-  }, [chatId])
+  }, [chatId]);
 
   const handleEmoji = (e) => {
     console.log(e);
@@ -106,6 +106,7 @@ const Chat = () => {
       url: '',
     });
     setText("");
+    // endRef.current.scrollIntoView({ behavior: "smooth" });
   }
 
   return (
@@ -113,9 +114,9 @@ const Chat = () => {
       {/* ---> Top (User avatar, name & icons [call, video, info]) */}
       <div className="top">
         <div className="user">
-          <img src={user.avatar || "./avatar.png"} alt="" />
+          <img src={user?.avatar || "./avatar.png"} alt="" />
           <div className="texts">
-            <span>{user.username}</span>
+            <span>{user?.username || "You are Blocked"}</span>
             {/* <p>Lorem ipsum dolor.</p> */}
           </div>
         </div>
@@ -129,6 +130,15 @@ const Chat = () => {
 
       {/* ---> Chat */}
       <div className="center">
+        {img.url && (
+          <div className="message own">
+            <div className="texts">
+              <img src={img.url} alt="" />
+              <p>Click on Send button for send image...</p>
+              <p onClick={() => setImg({file: null, url: ''})} style={{cursor: 'pointer'}}>Or Click here to Cancel...</p>
+            </div>
+          </div>
+        )}
         {
           chat?.messages?.map((message) => (
               <div 
@@ -141,17 +151,9 @@ const Chat = () => {
                   {/* <span>1 min ago</span> */}
                 </div>
               </div>
-          ))
+          )).reverse()
         }
 
-        {img.url && (
-          <div className="message own">
-            <div className="texts">
-              <img src={img.url} alt="" />
-              <p>Click on Send button for send image...</p>
-            </div>
-          </div>
-        )}
 
         <div ref={endRef}></div>
       </div>
@@ -170,8 +172,13 @@ const Chat = () => {
         <input
           type="text"
           value={text}
-          placeholder="Type a message..."
+          placeholder={
+            (isCurrentUserBlocked || isReceiverBlocked) 
+              ? "You can't send a message." 
+              : "Type a message..."
+          }
           onChange={(e) => setText(e.target.value)}
+          disabled={isCurrentUserBlocked || isReceiverBlocked}
         />
 
         <div className="emoji">
@@ -184,7 +191,13 @@ const Chat = () => {
             <EmojiPicker open={open} onEmojiClick={handleEmoji} searchDisabled={true} />
           </div>
         </div>
-        <button className="sendButton" onClick={handleSend}>Send</button>
+        <button 
+          className="sendButton" 
+          onClick={handleSend}
+          disabled={isCurrentUserBlocked || isReceiverBlocked}
+        >
+          Send
+        </button>
       </div>
     </div>
   );
