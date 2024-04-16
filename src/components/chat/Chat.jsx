@@ -1,16 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import EmojiPicker from "emoji-picker-react";
-import "./chat.css";
 import { arrayUnion, doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { useChatStore } from "../../lib/chatStore";
 import { useUserStore } from "../../lib/userStore";
-import { set } from "firebase/database";
+import "./chat.css";
+import upload from "../../lib/upload";
 
 const Chat = () => {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
   const [chat, setChat] = useState();
+  const [img, setImg] = useState({
+    file: null,
+    url: '',
+  });
   // use useRef for scroll .chat to bottom
   const endRef = useRef(null);
 
@@ -39,16 +43,35 @@ const Chat = () => {
     setOpen(false);
   };
 
+  function handleImage(e) {
+    if(e.target.files[0]) {
+        setImg({
+            file: e.target.files[0],
+            url: URL.createObjectURL(e.target.files[0]),
+        });
+    }
+  }
+
   const handleSend = async () => {
-    if(text === "") return;
+    if(text === "" && !img.file) return;
+
+    let imgUrl = null;
 
     // Send message to firestore.
     try {
+
+      if(img.file) {
+        imgUrl = await upload(img.file);
+      }
+
+
+
       await updateDoc(doc(db, 'chats', chatId), {
         messages: arrayUnion({
           senderId: currentUser.id,
           text,
-          createAt: new Date()
+          createAt: new Date(),
+          ...(imgUrl && {img: imgUrl}),
         })
       });
 
@@ -74,10 +97,15 @@ const Chat = () => {
         }
       });
 
-      setText("");
     } catch (error) {
       console.log(error);
     }
+    
+    setImg({
+      file: null,
+      url: '',
+    });
+    setText("");
   }
 
   return (
@@ -116,13 +144,25 @@ const Chat = () => {
           ))
         }
 
+        {img.url && (
+          <div className="message own">
+            <div className="texts">
+              <img src={img.url} alt="" />
+              <p>Click on Send button for send image...</p>
+            </div>
+          </div>
+        )}
+
         <div ref={endRef}></div>
       </div>
 
       {/* ---> Bottom (Icons [img, camera, mic], input, emoji picker & send button) */}
       <div className="bottom">  
         <div className="icons">
-          <img src="./img.png" alt="" />
+          <label htmlFor="file">
+            <img src="./img.png" alt="" />
+          </label>
+          <input type="file" id="file" style={{display: 'none'}} onChange={handleImage} />
           <img src="./camera.png" alt="" />
           <img src="./mic.png" alt="" />
         </div>
